@@ -13,38 +13,75 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  student
+  admin
+}
+
+enum RegistrationStatus {
+  active
+  canceled
+  finished
+}
+
 model User {
-  id         String       @id @default(cuid())
-  email      String       @unique
-  name       String
-  password   String?
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  createdBy  String
-  updatedBy  String
-  active     Boolean      @default(true)
-  Membership Membership[]
+  id            String   @id @default(uuid())
+  email         String   @unique
+  role          UserRole
+  password      String
+  createdAt     DateTime @default(now()) @map("created_at")
+  createdBy     User?    @relation("CreatedByUser", fields: [createdById], references: [id])
+  createdById   String?  @map("created_by")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  updatedBy     User?    @relation("UpdatedByUser", fields: [updatedById], references: [id])
+  updatedById   String?  @map("updated_by")
+  profile       Profile?
+  createdUsers  User[]   @relation("CreatedByUser")
+  updatedUsers  User[]   @relation("UpdatedByUser")
+  createdGroups Group[]  @relation("GroupCreatedBy")
+  updatedGroups Group[]  @relation("GroupUpdatedBy")
 }
 
-model Team {
-  id         String       @id @default(cuid())
-  name       String
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  createdBy  String
-  updatedBy  String
-  Membership Membership[]
+model Profile {
+  id            String         @id @default(uuid())
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String         @unique @map("user_id")
+  name          String?
+  birthday      DateTime?
+  phone         String?
+  registrations Registration[]
 }
 
-model Membership {
-  id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  team      Team     @relation(fields: [teamId], references: [id])
-  teamId    String
-  role      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  createdBy String
-  updatedBy String
+model Course {
+  id          String   @id @default(uuid())
+  name        String   @map("nome") @db.VarChar(100)
+  description String   @map("descricao") @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  groups      Group[]
+}
+
+model Group {
+  id            String         @id @default(uuid())
+  course        Course         @relation(fields: [courseId], references: [id])
+  courseId      String         @map("course_id")
+  code          String         @unique @db.VarChar(50)
+  startDate     DateTime       @map("start_date")
+  endDate       DateTime       @map("end_date")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  createdBy     User           @relation("GroupCreatedBy", fields: [createdById], references: [id])
+  createdById   String         @map("created_by")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  updatedBy     User           @relation("GroupUpdatedBy", fields: [updatedById], references: [id])
+  updatedById   String         @map("updated_by")
+  registrations Registration[]
+}
+
+model Registration {
+  id             String             @id @default(uuid())
+  student        Profile            @relation(fields: [studentId], references: [id])
+  studentId      String             @map("student_id")
+  group          Group              @relation(fields: [groupId], references: [id])
+  groupId        String             @map("group_id")
+  registrationAt DateTime           @default(now()) @map("registration_at")
+  status         RegistrationStatus
 }
