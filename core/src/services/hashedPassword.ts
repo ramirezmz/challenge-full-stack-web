@@ -6,6 +6,9 @@ export async function hashedPassword(password: string) {
   return hashed;
 }
 
-export function comparePassword(password: string, hashedPassword: string) {
+export function comparePassword(password: string, hashedPassword: string | null) {
+  if (!hashedPassword) {
+    return false;
+  }
   return bcrypt.compareSync(password, hashedPassword);
 }
