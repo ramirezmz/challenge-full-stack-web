@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { validateBody } from "../utils/validators";
 import { createBasicUserSchema } from "../database/Users";
-import { hashedPassword } from "../services/hashedPassword";
+import { comparePassword, hashedPassword } from "../services/hashedPassword";
 import prisma from "../lib/prisma";
+import { generateToken } from "../services/token";
 
 class UserController {
   async healthCheck(request: Request, response: Response) {
@@ -52,6 +53,69 @@ class UserController {
         user: userWithoutPassword,
         profile,
       },
+    });
+    } catch (error) {
+      res.status(500).json({
+        message: "Something went wrong",
+        error: error
+      })
+    }
+  }
+
+  async listAll(req: Request, res: Response) {
+    try {
+      const users = await prisma.user.findMany({
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          profile: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+      return res.status(200).json({
+        message: "GET request successful",
+        body: users,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Something went wrong",
+        error: error
+      })
+    }
+  }
+
+  async signIn(req: Request, res: Response) {
+    try {
+      const content = await validateBody(req, createBasicUserSchema);
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: content.email,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const passwordMatch = comparePassword(content.password, user?.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    const token = generateToken(user.id, user.role);
+
+    const { password, ...userWithoutPassword } = user;
+
+    return res.status(200).json({
+      message: "Login successful",
+      body: { token, user: userWithoutPassword },
     });
     } catch (error) {
       res.status(500).json({
