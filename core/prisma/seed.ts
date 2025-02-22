@@ -57,6 +57,9 @@ async function main() {
     courses.map(course => prisma.course.create({ data: course }))
   )
 
+  await createStudents(admin.id)
+
+
 for (const course of createdCourses) {
   const timestamp = Date.now()
   await Promise.all([
@@ -112,6 +115,41 @@ async function cleanDatabase() {
     prisma.user.deleteMany(),
   ])
   console.log('Database cleaned successfully')
+}
+
+async function createStudents(createdBy: string) {
+  const students = Array.from({ length: 20 }, (_, index) => ({
+    email: `student${index + 1}@example.com`,
+    password: '123456',
+    name: `Student ${index + 1}`,
+    academic_registration: `2024${String(index + 1).padStart(4, '0')}`,
+    identification: `ID${String(index + 1).padStart(5, '0')}`
+  }))
+
+  const createdStudents = await Promise.all(
+    students.map(async student => {
+      const hashedPass = await hashedPassword(student.password)
+      return prisma.user.create({
+        data: {
+          email: student.email,
+          password: hashedPass,
+          role: 'student',
+          createdById: createdBy,
+          updatedById: createdBy,
+          profile: {
+            create: {
+              name: student.name,
+              academic_registration: student.academic_registration,
+              identification: student.identification
+            }
+          }
+        }
+      })
+    })
+  )
+
+  console.log('Students created successfully')
+  return createdStudents
 }
 
 main()
