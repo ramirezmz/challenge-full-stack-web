@@ -33,4 +33,16 @@ router.get('/student/list-all',async (req:Request, res: Response, next) => {
     await Student.listAll(req, res);
 });
 
+router.put('/user/update/:id',async (req:Request, res: Response, next) => {
+    await authMiddleware(req, res, next);
+}, async (req: Request, res: Response) => {
+    await User.updateOne(req, res);
+});
+
+router.delete('/user/:id',async (req:Request, res: Response, next) => {
+    await authMiddleware(req, res, next);
+} , async (req: Request, res: Response) => {
+    await User.deleteOne(req, res);
+});
+
 export default router;

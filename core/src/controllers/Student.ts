@@ -36,11 +36,12 @@ class StudentController {
         data: {
           email: content.email,
           role: DEFAULT_ROLE,
+          createdBy: req.user.id,
           profile: {
             create: {
               name: content.name,
               academic_registration: content.academic_registration,
-              identification: content.identification
+              identification: content.identification,
             }
           }
         },
@@ -92,6 +93,7 @@ class StudentController {
       })
     }
   }
+
 }
 
 export default new StudentController();

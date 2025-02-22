@@ -124,6 +124,87 @@ class UserController {
       })
     }
   }
+
+  async updateOne(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { email, name, academic_registration, identification } = req.body;
+
+      const existingUser = await prisma.user.findUnique({
+        where: { id },
+        include: { profile: true }
+      });
+
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const updatedUser = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.update({
+          where: { id },
+          data: {
+            updatedBy: req.user.id,
+            email: email || undefined,
+          },
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+            profile: true
+          }
+        });
+
+        if (existingUser.profile && (name || academic_registration || identification)) {
+          await tx.profile.update({
+            where: { userId: id },
+            data: {
+              name: name || undefined,
+              academic_registration: academic_registration || undefined,
+              identification: identification || undefined
+            }
+          });
+        }
+
+        return user;
+      });
+
+      return res.status(200).json({
+        message: "User updated successfully",
+        body: updatedUser
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: "Something went wrong",
+        error: error
+      });
+    }
+  }
+
+  async deleteOne(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const existingUser = await prisma.user.findUnique({
+        where: { id },
+        include: { profile: true }
+      });
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      await prisma.user.delete({
+        where: { id },
+      });
+      return res.status(200).json({
+        message: "User deleted successfully",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: "Something went wrong",
+        error: error
+      });
+    }
+  }
 }
 
 export default new UserController()
