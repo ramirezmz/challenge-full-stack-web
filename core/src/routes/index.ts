@@ -49,6 +49,12 @@ router.delete('/user/:id',async (req:Request, res: Response, next) => {
     await User.deleteOne(req, res);
 });
 
+router.get('/user/:userId', async (req:Request, res: Response, next) => {
+    await authMiddleware(req, res, next);
+}, async (req: Request, res: Response) => {
+    await User.getOne(req, res);
+})
+
 router.post('/user/:userId/group/:groupId/registration', async (req:Request, res: Response, next) => {
     await authMiddleware(req, res, next);
 }, async (req: Request, res: Response) => {
