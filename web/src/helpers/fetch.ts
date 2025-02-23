@@ -34,5 +34,15 @@ export const authService = {
   async deleteUser(userId: string) {
     const response = await api.delete(`/user/${userId}`)
     return response.data
+  },
+
+  async updateStudent(id: string, data: createStudentSchema) {
+    const response = await api.put(`/user/update/${id}`, data)
+    return response.data
+  },
+
+  async getUser(userId: string) {
+    const response = await api.get(`/user/${userId}`)
+    return response.data
   }
 }

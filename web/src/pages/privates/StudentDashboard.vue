@@ -36,6 +36,7 @@
               size="small"
               variant="text"
               color="primary"
+              @click="handleEdit(user.id)"
             />
             <v-btn
               icon="mdi-delete"
@@ -61,11 +62,13 @@ import { onMounted, ref } from 'vue'
 import { authService } from '@/helpers/fetch'
 import type { User } from '@/interfaces'
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog.vue'
+import { useRouter } from 'vue-router'
 
 const search = ref('')
 const users = ref<User[]>([])
 const deleteDialog = ref<InstanceType<typeof DeleteConfirmationDialog> | null>(null)
 const selectedUserId = ref('')
+const router = useRouter()
 
 const handleSearch = () => {
   console.log('Searching for:', search.value)
@@ -104,6 +107,10 @@ const confirmDelete = async (userId: string) => {
   } catch (error) {
     console.error('Error deleting user:', error)
   }
+}
+
+const handleEdit = (userId: string) => {
+  router.push(`/dashboard/students/${userId}`)
 }
 
 onMounted(() => {

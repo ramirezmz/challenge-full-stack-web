@@ -28,7 +28,12 @@ const router = createRouter({
           path: 'admins',
           name: 'admins',
           component: () => import('@/pages/privates/AdminDashboard.vue')
-        }
+        },
+        {
+          path: '/dashboard/students/:userId',
+          name: 'edit-student',
+          component: () => import('@/pages/privates/EditStudent.vue')
+        },
       ]
     },
     {
