@@ -29,5 +29,10 @@ export const authService = {
   async createUser(data: createStudentSchema) {
     const response = await api.post('/student/create', data)
     return response.data
+  },
+
+  async deleteUser(userId: string) {
+    const response = await api.delete(`/user/${userId}`)
+    return response.data
   }
 }

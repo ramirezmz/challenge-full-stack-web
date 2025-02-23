@@ -42,11 +42,17 @@
               size="small"
               variant="text"
               color="error"
+              @click="() => handleDelete(user.id)"
             />
           </td>
         </tr>
       </tbody>
     </v-table>
+    <DeleteConfirmationDialog
+      ref="deleteDialog"
+      :user-id="selectedUserId"
+      @confirm="confirmDelete"
+    />
   </v-container>
 </template>
 
@@ -54,9 +60,12 @@
 import { onMounted, ref } from 'vue'
 import { authService } from '@/helpers/fetch'
 import type { User } from '@/interfaces'
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog.vue'
 
 const search = ref('')
 const users = ref<User[]>([])
+const deleteDialog = ref<InstanceType<typeof DeleteConfirmationDialog> | null>(null)
+const selectedUserId = ref('')
 
 const handleSearch = () => {
   console.log('Searching for:', search.value)
@@ -80,6 +89,20 @@ const fetchUsers = async () => {
     users.value = response.body
   } catch (error) {
     console.error('Error fetching users:', error)
+  }
+}
+
+const handleDelete = (userId: string) => {
+  selectedUserId.value = userId
+  deleteDialog.value?.open()
+}
+
+const confirmDelete = async (userId: string) => {
+  try {
+    await authService.deleteUser(userId)
+    await fetchUsers()
+  } catch (error) {
+    console.error('Error deleting user:', error)
   }
 }
 
