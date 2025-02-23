@@ -15,7 +15,9 @@ router.post('/user/create', async (req: Request, res: Response) => {
     await User.create(req, res);
 });
 
-router.get('/user/list-all', async (req: Request, res: Response) => {
+router.get('/user/list-all', async (req:Request, res: Response, next) => {
+    await authMiddleware(req, res, next);
+}, async (req: Request, res: Response) => {
     await User.listAll(req, res);
 });
 

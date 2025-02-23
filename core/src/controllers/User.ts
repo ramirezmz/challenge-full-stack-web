@@ -64,7 +64,18 @@ class UserController {
 
   async listAll(req: Request, res: Response) {
     try {
+      const { role } = req.query;
+      const requestingUser = req.user;
+
+      const query: any = {}
+      if (requestingUser.role === "student") {
+        query.role = "student"
+      } else if (role && ['student', 'admin'].includes(role as string)) {
+        query.role = role
+      }
+
       const users = await prisma.user.findMany({
+        where: query,
         select: {
           id: true,
           email: true,
@@ -82,6 +93,7 @@ class UserController {
         body: users,
       });
     } catch (error) {
+      console.log("error: ", error)
       res.status(500).json({
         message: "Something went wrong",
         error: error

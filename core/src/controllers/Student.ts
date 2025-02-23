@@ -36,7 +36,8 @@ class StudentController {
         data: {
           email: content.email,
           role: DEFAULT_ROLE,
-          createdBy: req.user.id,
+          createdById: req.user.id,
+          updatedById: req.user.id,
           profile: {
             create: {
               name: content.name,
@@ -57,6 +58,7 @@ class StudentController {
         body: userWithoutPassword
       });
     } catch (error) {
+      console.log("Error on create student: ", error)
       res.status(500).json({
         message: "Something went wrong",
         error: error
