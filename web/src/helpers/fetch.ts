@@ -1,3 +1,4 @@
+import { type createStudentSchema, type ListAllUsersResponse } from '@/interfaces'
 import api from '@/services/api'
 
 interface LoginResponse {
@@ -18,6 +19,15 @@ export const authService = {
       email,
       password
     })
+    return response.data
+  },
+  async listAll(query: { role?: string }) {
+    const response = await api.get<ListAllUsersResponse>('/user/list-all', { params: query })
+    return response.data
+  },
+
+  async createUser(data: createStudentSchema) {
+    const response = await api.post('/student/create', data)
     return response.data
   }
 }
