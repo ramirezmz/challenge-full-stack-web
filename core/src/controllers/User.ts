@@ -64,14 +64,36 @@ class UserController {
 
   async listAll(req: Request, res: Response) {
     try {
-      const { role } = req.query;
+      const { role, search } = req.query;
       const requestingUser = req.user;
 
-      const query: any = {}
+      const query: any = {
+        AND: []
+      }
+
       if (requestingUser.role === "student") {
-        query.role = "student"
+        query.AND.push({
+          role: "student"
+        })
       } else if (role && ['student', 'admin'].includes(role as string)) {
-        query.role = role
+        query.AND.push({
+          role: role
+        })
+      }
+
+      if (search) {
+        query.AND.push({
+          profile: {
+            name: {
+              contains: search as string,
+              mode: "insensitive"
+            }
+          }
+        })
+      }
+
+      if (query.AND.length === 0) {
+        delete query.AND;
       }
 
       const users = await prisma.user.findMany({
@@ -199,18 +221,42 @@ class UserController {
       const { id } = req.params;
       const existingUser = await prisma.user.findUnique({
         where: { id },
-        include: { profile: true }
+        include: { 
+          profile: {
+            include: {
+              registrations: true
+            }
+          }
+        }
       });
       if (!existingUser) {
         return res.status(404).json({ message: "User not found" });
       }
-      await prisma.user.delete({
-        where: { id },
+      await prisma.$transaction(async (tx) => {
+        if (existingUser.profile) {
+          if (existingUser.profile.registrations.length > 0) {
+            await tx.registration.deleteMany({
+              where: {
+                studentId: existingUser.profile.id
+              }
+            });
+          }
+
+          await tx.profile.delete({
+            where: { userId: id }
+          });
+        }
+
+        await tx.user.delete({
+          where: { id }
+        });
       });
+
       return res.status(200).json({
         message: "User deleted successfully",
       });
     } catch (error) {
+      console.log("error: ", error)
       return res.status(500).json({
         message: "Something went wrong",
         error: error
