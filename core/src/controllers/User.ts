@@ -177,7 +177,7 @@ class UserController {
         const user = await tx.user.update({
           where: { id },
           data: {
-            updatedBy: req.user.id,
+            updatedById: req.user.id,
             email: email || undefined,
           },
           select: {
@@ -257,6 +257,32 @@ class UserController {
       });
     } catch (error) {
       console.log("error: ", error)
+      return res.status(500).json({
+        message: "Something went wrong",
+        error: error
+      });
+    }
+  }
+
+  async getOne(req: Request, res: Response) {
+    try {
+      const { userId } = req.params;
+      const existingUser = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { profile: {
+          include: {
+            registrations: true
+          }
+        }}
+      });
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      return res.status(200).json({
+        message: "User retrieved successfully",
+        body: existingUser
+      });
+    } catch (error) {
       return res.status(500).json({
         message: "Something went wrong",
         error: error
