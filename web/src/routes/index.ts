@@ -13,7 +13,23 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/pages/privates/Dashboard.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          redirect: '/dashboard/students'
+        },
+        {
+          path: 'students',
+          name: 'students',
+          component: () => import('@/pages/privates/StudentDashboard.vue')
+        },
+        {
+          path: 'admins',
+          name: 'admins',
+          component: () => import('@/pages/privates/AdminDashboard.vue')
+        }
+      ]
     },
     {
       path: '/',
