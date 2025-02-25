@@ -6,6 +6,12 @@ import prisma from "../lib/prisma";
 class StudentController {
   async create(req: Request, res: Response) {
     const DEFAULT_ROLE = "student"
+    
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        message: "Forbidden"
+      })
+    }
     try {
       const content = await validateBody(req, createStudentSchema);
 
@@ -95,7 +101,6 @@ class StudentController {
       })
     }
   }
-
 }
 
 export default new StudentController();

@@ -13,10 +13,15 @@ class UserController {
   }
   async create(req: Request, res: Response) {
     const DEFAULT_ROLE = "admin"
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        message: "Forbidden"
+      })
+    }
     try {
       const content = await validateBody(req, createBasicUserSchema);
-      console.log("content: ", content)
-    let newHashedPassword = null;
+      let newHashedPassword = null;
 
     if (!content?.password) {
       res.status(400).json({
@@ -209,6 +214,7 @@ class UserController {
         body: updatedUser
       });
     } catch (error) {
+      console.log("MEME: ", error)
       return res.status(500).json({
         message: "Something went wrong",
         error: error
@@ -217,6 +223,11 @@ class UserController {
   }
 
   async deleteOne(req: Request, res: Response) {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        message: "Forbidden"
+      })
+    }
     try {
       const { id } = req.params;
       const existingUser = await prisma.user.findUnique({
