@@ -118,6 +118,7 @@ core/
 - Implementação de rate limiting.
 - Validação de força de senha.
 - Login com Google ou outros provedores.
+- Implementação da funcionalidade de matriculas (Fiz o backend, mas não implementei o frontend).
 
 **Perfomance**
 
@@ -129,3 +130,66 @@ core/
 
 - Melhorar feedback visual de erros
 - Adicionar mais animações e transições
+
+# Como rodar o projeto
+
+### Dependências
+
+- Node.js (v22.13.1)
+- NPM
+- Docker
+
+O projeto é dividido em duas partes: backend e frontend. Para rodar o projeto, basta seguir os seguintes passos:
+
+## Backend
+
+1. Clone o repositório
+
+```bash
+git clone https://github.com/ramirezmz/challenge-full-stack-web.git
+```
+
+2. Instale as dependências
+
+```bash
+$ cd core
+$ npm install
+```
+
+3. Crie o banco de dados
+
+```bash
+docker-compose up -d
+```
+
+4. Rode as migrations e o populate
+
+```bash
+$ npm run generate
+$ npm run seed
+```
+
+5. Rode o projeto
+
+```bash
+npm run dev
+```
+
+## Frontend
+
+1. Instale as dependências
+
+```bash
+$ cd web
+$ npm install
+```
+
+2. Rode o projeto
+
+```bash
+npm run dev
+```
+
+3. Abrir o navegador e acessar o endereço e acessar o endereço `http://localhost:5173`
+
+4. Logar com o usuário `admin@example.com` e senha `123456`
