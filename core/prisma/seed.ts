@@ -89,7 +89,7 @@ for (const course of createdCourses) {
   console.log('Seed completed successfully')
 }
 
-async function factoryAdminUser () {
+export async function factoryAdminUser () {
   const adminPassword = await hashedPassword('123456')
   const admin = await prisma.user.create({
     data: {
@@ -106,8 +106,9 @@ async function factoryAdminUser () {
   return admin
 }
 
-async function cleanDatabase() {
-  await prisma.$transaction([
+export async function cleanDatabase() {
+ try {
+   await prisma.$transaction([
     prisma.registration.deleteMany(),
     prisma.group.deleteMany(),
     prisma.course.deleteMany(),
@@ -115,6 +116,10 @@ async function cleanDatabase() {
     prisma.user.deleteMany(),
   ])
   console.log('Database cleaned successfully')
+ } catch (error) {
+  console.log('Error cleaning database:', error)
+  throw error
+ }
 }
 
 async function createStudents(createdBy: string) {
