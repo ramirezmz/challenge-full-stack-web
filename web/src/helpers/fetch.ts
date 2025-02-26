@@ -1,4 +1,4 @@
-import { type createStudentSchema, type ListAllUsersResponse } from '@/interfaces'
+import { type GroupResponse, type createStudentSchema, type ListAllUsersResponse } from '@/interfaces'
 import api from '@/services/api'
 
 interface LoginResponse {
@@ -43,6 +43,11 @@ export const authService = {
 
   async getUser(userId: string) {
     const response = await api.get(`/user/${userId}`)
+    return response.data
+  },
+
+  async listAllGroups(query?: { search?: string }) {
+    const response = await api.get<GroupResponse>('/group/list-all', { params: query })
     return response.data
   }
 }

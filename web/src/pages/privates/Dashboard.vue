@@ -14,6 +14,12 @@
           :active="currentRoute === 'admins'"
           @click="navigate('admins')"
         />
+        <v-list-item
+          prepend-icon="mdi-google-classroom"
+          title="Groups"
+          :active="currentRoute === 'groups'"
+          @click="navigate('groups')"
+        />
       </v-list>
     </v-navigation-drawer>
 

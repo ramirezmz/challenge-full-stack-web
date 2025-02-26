@@ -34,6 +34,11 @@ const router = createRouter({
           name: 'edit-student',
           component: () => import('@/pages/privates/EditStudent.vue')
         },
+        {
+          path: '/dashboard/groups',
+          name: 'groups',
+          component: () => import('@/pages/privates/GroupsDashboard.vue')
+        }
       ]
     },
     {
