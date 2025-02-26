@@ -13,6 +13,7 @@
   "dependencies": {
     "@mdi/font": "7.4.47",
     "axios": "^1.7.9",
+    "lodash": "^4.17.21",
     "roboto-fontface": "*",
     "vue": "^3.4.31",
     "vue-router": "^4.5.0",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
+    "@types/lodash": "^4.17.15",
     "@types/node": "^22.9.0",
     "@types/vue-router": "^2.0.0",
     "@vitejs/plugin-vue": "^5.1.4",

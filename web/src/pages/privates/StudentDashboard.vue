@@ -63,16 +63,13 @@ import { authService } from '@/helpers/fetch'
 import type { User } from '@/interfaces'
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog.vue'
 import { useRouter } from 'vue-router'
+import { debounce } from 'lodash'
 
 const search = ref('')
 const users = ref<User[]>([])
 const deleteDialog = ref<InstanceType<typeof DeleteConfirmationDialog> | null>(null)
 const selectedUserId = ref('')
 const router = useRouter()
-
-const handleSearch = () => {
-  console.log('Searching for:', search.value)
-}
 
 const handleCreateStudent = async (studentData: any) => {
   try {
@@ -82,6 +79,26 @@ const handleCreateStudent = async (studentData: any) => {
   } catch (error) {
     console.error('Error creating student:', error)
   }
+}
+
+const fetchUsersBySearch = async (searchTerm?: string) => {
+  try {
+    const response = await authService.listAll({
+      role:'student',
+      search: searchTerm
+    })
+    users.value = response.body
+  } catch (error) {
+    console.error('Error fetching users:', error)
+  }
+}
+
+const debouncedSearch = debounce(async (searchTerm: string) => {
+  await fetchUsersBySearch(searchTerm)
+}, 500)
+
+const handleSearch = async () => {
+  await debouncedSearch(search.value)
 }
 
 const fetchUsers = async () => {

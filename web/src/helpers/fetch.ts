@@ -21,7 +21,7 @@ export const authService = {
     })
     return response.data
   },
-  async listAll(query: { role?: string }) {
+  async listAll(query: { role?: string, search?: string }) {
     const response = await api.get<ListAllUsersResponse>('/user/list-all', { params: query })
     return response.data
   },
